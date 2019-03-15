@@ -1,9 +1,9 @@
-
+global.log = console.log.bind(console)
 # components
 
 TileGrid = require '../components/TileGrid.coffee'
 
-global.log = console.log.bind(console)
+
 require 'normalize.css'
 StateHandle = require 'simple-state-handle'
 {Component,createElement} = require 'react'
@@ -60,7 +60,7 @@ class Docs extends Component
 	constructor: (props)->
 		super(props)
 		@state =
-			items: [0...100].map (i)->
+			items: [0...1000].map (i)->
 				return
 					index: i
 					width: Math.floor(1+Math.random()*2)
@@ -68,31 +68,32 @@ class Docs extends Component
 
 	render: ->
 		grid_list = h TileGrid,
-			item_count: 10
+			item_count: 1000
 			width: 6
 			height: -1
-			getItemWidth: (index)->
+			getItemWidth: (index)=>
 				@state.items[index].width
 
-			getItemHeight: (index)->
+			getItemHeight: (index)=>
 				@state.items[index].height
 
-			renderItem: (opt)->
+			renderItem: (opt)=>
+				# log opt
 				h 'div',
-					key: opt.key
+					key: opt.index
 					className: 'grid-item'
 					style:
 						left: opt.x
 						top: opt.y
 						width: opt.width
 						height: opt.height
-						background: 'rgba(255,255,255,'+((i.index%10)/10)+')'
-					h 'span',{},opt.key
+						background: 'rgba(0,0,0,'+(0.2+(opt.index%10)/30)+')'
+					h 'span',{},opt.index
 
 
 		h Slide,
 			beta: 100
-			className: 'docs-slide'			
+			className: 'docs-slide'
 			vert: yes
 			center: yes
 			grid_list

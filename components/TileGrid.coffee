@@ -6,16 +6,18 @@ TileGrid2 = TileGrid
 
 
 
-
 class TileGrid extends Component
 	constructor: (props)->
 		super(props)
 		@state = 
-			grid_items: []
+			p_offset: 0
+			scroll_start_beta: .5
+			scroll_end_beta: 1
 
 
 
 	componentWillUpdate: (props,state)->
+
 		if @props.width != props.width || @props.height != props.height
 			@buildTileGrid(props.width,props.height,props.item_count) #rebuild everything
 			return
@@ -29,22 +31,38 @@ class TileGrid extends Component
 
 	getStartYFromScroll: (dim,vert)->
 		if vert
-			return @_base.scrollTop / dim
+			s_y = (@_base.scrollTop / dim) - (@_base.clientHeight * @state.scroll_start_beta / dim)
 		else
-			return @_base.scrollLeft / dim
+			s_y = (@_base.scrollLeft / dim) - (@_base.clientWidth * @state.scroll_start_beta / dim)
+
+		s_y = Math.floor(s_y)
+		if s_y <= 0
+			s_y = 0
+		if s_y >= @grid.y2
+			s_y = @grid.y2
+
+		return s_y
 
 
 	getEndYFromScroll: (dim,vert)->
 		offset = @getStartYFromScroll(dim,vert)
 
 		if vert
-			return offset + @_base.clientHeight / dim
+			s_x = offset + @_base.clientHeight / dim + @_base.clientHeight * @state.scroll_end_beta / dim
 		else
-			return offset + @_base.clientWidth / dim
+			s_x = offset + @_base.clientWidth / dim + @_base.clientWidth * @state.scroll_end_beta / dim
 
+		s_x = Math.floor(s_x+1)
+		if s_x <= 0
+			s_x = 0
+		if s_x >= @grid.y2
+			s_x = @grid.y2
+
+		return s_x
 
 
 	getRenderItems: ()->
+		
 		dim = @calculateDim()
 		vert = @isVert()
 		
@@ -70,13 +88,19 @@ class TileGrid extends Component
 
 		items = []
 
-		@grid.clip start_x,end_x,start_y,end_y,(tile)=>
+		# log 'get render items',start_y,end_y,start_x,end_x
+
+		@grid.crop start_x,end_x,start_y,end_y,(tile,x,y)=>
+			tile_w = (tile.x2 - tile.x1) * dim
+			tile_h = (tile.y2 - tile.y1) * dim
+			tile_x = tile.rect.x1 * dim
+			tile_y = tile.rect.y1 * dim
 			opts =
-				key: tile.item.key
-				width: vert && (tile.width * dim) || (tile.height * dim)
-				height: vert && (tile.height * dim) || (tile.width * dim)
-				x: vert && (tile.x1 * dim) || (tile.y1 * dim)
-				y: vert && (tile.y1 * dim) || (tile.x1 * dim)
+				index: tile.item.index
+				width: if vert then tile_w else tile_h
+				height: if vert then tile_h else tile_w
+				x: if vert then tile_x else tile_y
+				y: if vert then tile_y else tile_x
 			items.push @props.renderItem(opts)
 
 		return items
@@ -113,20 +137,22 @@ class TileGrid extends Component
 
 
 	addItem: (vert,dim,i)->
+		# log 'add item',i
 		w = @props.getItemWidth(i)
 		h = @props.getItemHeight(i)
+
 		
-		full_x = @_grid.full.x2
+		full_x = @grid.full.x2
 
 		item = 
-			key: 'i'+i
+			index: i
 			
 		tile = new Tile
 			width: w
 			height: h
 			item: item
 
-		while !@grid.addTile(tile,@_grid.full.x2,@_grid.x2,@_grid.full.y2,@_grid.y2)
+		while !@grid.addTile(tile,@grid.full.x2,@grid.x2,@grid.full.y2,@grid.y2)
 			@grid.pad(0,0,0,10)
 			
 
@@ -134,23 +160,45 @@ class TileGrid extends Component
 	calculateGridObjects: (item_count,start_count=0)->
 		vert = @isVert()
 		dim = @calculateDim()
-		items = [start_count...item_count].map @addItem.bind(@,vert,dim,i)
+		items = [start_count...item_count].map @addItem.bind(@,vert,dim)
 
 
 
 	gridRef: (el)=>
 		@_base = el
 		if @_base
+			
 			@buildTileGrid(@props.width,@props.height,@props.item_count)
 			@forceUpdate()
 
+	onScroll: (e)=>
+		offset = e.target.scrollTop || e.target.scrollLeft
+		dim = @calculateDim()
+		if Math.abs(offset - @state.p_offset) > dim
+			@state.p_offset = offset
+			@forceUpdate()
+				
 
 
 	render: ->
-		h 'div',
-			ref: gridRef
-			clasName: 're-tile-grid ' + (@isVert() && 're-tile-grid-vert' || '')
-			@_base && @getRenderItems() || null
+		vert = @isVert()
+
+		if @grid
+			dim = @calculateDim()
+			max_height = @grid.y2 * dim
+			max_width = '100%'
+			
+
+		createElement 'div',
+			ref: @gridRef
+			onScroll: @onScroll
+			className: 're-tile-grid ' + (vert && 're-tile-grid-vert' || '')
+			createElement 'div',
+				className: 're-tile-grid-inner'
+				style:
+					width: if vert then max_width else max_height
+					height: if vert then max_height else max_width
+				@_base && @getRenderItems() || null
 
 
 module.exports = TileGrid

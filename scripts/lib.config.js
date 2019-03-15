@@ -1,38 +1,37 @@
 var webpack = require("webpack");
 var path = require("path");
+
+
 var cfg = {
 	devtool: 'source-map',
 	module: {
 		rules: [
 			{ test: /\.coffee$/, use: "coffee-loader"},
 			{ test: /\.(xml|html|txt|md|glsl|svg)$/, loader: "raw-loader" },
-			{ test: /\.(less)$/, exclude: /^(https?:)?\/\//,use: ['style-loader',{loader:'css-loader',options: {
-			    modules: true,
-			    // importLoaders: 1,
-			     localIdentName: 'lui-[local]'//localIdentName: 'lui-[hash:base64:5]'
-			  }},{
-			  	loader:'less-loader',
-			  	options:{
-			  		modifyVars:{"dim":process.env.DIM+"px"}
-			  	}
-
-			  }] },
+			{ test: /\.(less)$/, exclude: /^(https?:)?\/\//,use: ['style-loader','css-loader','less-loader'] },
 			{ test: /\.(css)$/, exclude: /^(https?:)?\/\//, use: ['style-loader','css-loader'] },
 			{ test: /\.(woff|woff2|eot|ttf|png)$/,loader: 'url-loader?limit=65000' }
 		]
 	},
+
 	entry: {
-		index: "./components/index.coffee",
+		'tile-grid': path.join(__dirname,'..','/components/TileGrid.coffee')
 	},
 	resolve: {
 		extensions: [ '.js', '.coffee' ]
+	},	
+	output: {
+		path: path.join(__dirname,'..','/builds'),
+		publicPath: '/builds',
+		filename: "tile-grid.js"
 	},
 	externals: ["re-slide","react","react-dom","classnames","color"],
 	output: {
-		path: path.join(__dirname,'..','/dist'),
+		path: path.join(__dirname,'..','/builds'),
 		publicPath: '/',
-		filename: process.env.LIBNAME+".js",
+		filename: "tile-grid.js",
 		libraryTarget: 'commonjs2'
 	}
 }
-module.exports = cfg;
+
+module.exports = cfg
