@@ -3,8 +3,7 @@
   "version": "0.0.1",
   "description": "react scrollable tetris grid",
   "main": "./dist/lib.js",
-  "scripts": {
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/lerp-io/re-grid-list.git"
@@ -23,20 +22,21 @@
     "less-loader": "^4.1.0",
     "normalize.css": "^8.0.1",
     "raw-loader": "^0.5.1",
-    "re-slide": "^1.0.6",
-    "react": "^16.7.0",
-    "react-dom": "^16.7.0",
+    "re-lui": "^0.5.6-b",
+    "re-slide": "^1.1.5",
+    "react": "^16.8.4",
+    "react-dom": "^16.8.4",
     "react-virtualized": "^9.21.0",
     "style-loader": "^0.21.0",
-    "webpack": "^4.28.4",
-    "webpack-cli": "^3.2.1",
-    "webpack-dev-server": "^3.1.14"
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.2.3",
+    "webpack-dev-server": "^3.2.1"
   },
   "peerDependencies": {
     "react": "^16.7.0",
     "react-dom": "^16.7.0"
   },
   "dependencies": {
-    "tile-grid-util":"*"
+    "tile-grid-util": "^0.2.0"
   }
 }
