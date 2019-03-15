@@ -1,7 +1,7 @@
 
 # components
 
-GridList = require '../components/GridList.coffee'
+TileGrid = require '../components/TileGrid.coffee'
 
 global.log = console.log.bind(console)
 require 'normalize.css'
@@ -21,7 +21,7 @@ h = createElement
 class Interface extends StateHandle
 	constructor: (props)->
 		super(props)
-		@state =
+		@state = {}
 			
 		# @route = rlite @setState.bind(@,new Error 'not found'),
 		# 	'/': @showHome
@@ -59,8 +59,7 @@ class Interface extends StateHandle
 class Docs extends Component
 	constructor: (props)->
 		super(props)
-
-		@state = 
+		@state =
 			items: [0...100].map (i)->
 				return
 					index: i
@@ -68,7 +67,7 @@ class Docs extends Component
 					height: Math.floor(1+Math.random()*2)
 
 	render: ->
-		grid_list = h GridList,
+		grid_list = h TileGrid,
 			item_count: 10
 			width: 6
 			height: -1
@@ -79,11 +78,14 @@ class Docs extends Component
 				@state.items[index].height
 
 			renderItem: (opt)->
-				console.log  opt
 				h 'div',
-					key: opt.item.index
+					key: opt.key
 					className: 'grid-item'
-					style: 
+					style:
+						left: opt.x
+						top: opt.y
+						width: opt.width
+						height: opt.height
 						background: 'rgba(255,255,255,'+((i.index%10)/10)+')'
 					h 'span',{},opt.key
 
@@ -96,15 +98,13 @@ class Docs extends Component
 			grid_list
 
 
-Docs.contextType = StyleContext
-
 
 
 window.face = new Interface
 	view: Docs
 	el: window.docs
 
-face.processHash()
+# face.processHash()
 
 
 face.render()

@@ -1,8 +1,13 @@
 {createElement,Component} = require 'react'
-require './GridList.less'
-{TileGrid,Tile,Rect} = require 'tile-grid-util'
+require './TileGrid.less'
 
-class GridList extends Component
+{TileGrid,Tile,Rect} = require 'tile-grid-util'
+TileGrid2 = TileGrid
+
+
+
+
+class TileGrid extends Component
 	constructor: (props)->
 		super(props)
 		@state = 
@@ -86,7 +91,7 @@ class GridList extends Component
 
 
 	buildTileGrid: (width,height,item_count)->
-		@grid = new TileGrid
+		@grid = new TileGrid2
 			width: width > 0 && width || 1
 			height: height > 0 && height || 1
 
@@ -144,8 +149,8 @@ class GridList extends Component
 	render: ->
 		h 'div',
 			ref: gridRef
-			clasName: 're-grid-list ' + (@isVert() && 're-grid-list-vert' || '')
+			clasName: 're-tile-grid ' + (@isVert() && 're-tile-grid-vert' || '')
 			@_base && @getRenderItems() || null
 
 
-module.exports = GridList
+module.exports = TileGrid

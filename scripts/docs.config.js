@@ -1,45 +1,35 @@
 var webpack = require("webpack");
 var path = require("path");
-define_plugin = new webpack.DefinePlugin({
-  DIM: "42"
-})
+
+
 var cfg = {
 	devtool: 'source-map',
 	module: {
 		rules: [
 			{ test: /\.coffee$/, use: "coffee-loader"},
 			{ test: /\.(xml|html|txt|md|glsl|svg)$/, loader: "raw-loader" },
-			{ test: /\.(less)$/, exclude: /^(https?:)?\/\//,use: ['style-loader',{loader:'css-loader',options: {
-			    modules: true,
-			    localIdentName: 'lui-[local]'
-			  }},{
-			  	loader:'less-loader',
-			  	// options:{
-			  	// 	modifyVars:{"dim":"30px"}
-			  	// }
-
-			  }] },
+			{ test: /\.(less)$/, exclude: /^(https?:)?\/\//,use: ['style-loader','css-loader','less-loader'] },
 			{ test: /\.(css)$/, exclude: /^(https?:)?\/\//, use: ['style-loader','css-loader'] },
 			{ test: /\.(woff|woff2|eot|ttf|png)$/,loader: 'url-loader?limit=65000' }
 		]
 	},
 
 	entry: {
-		demo: path.join(__dirname,'..','/demo.coffee')
+		docs: path.join(__dirname,'..','/docs/docs.coffee')
 	},
 	resolve: {
 		extensions: [ '.js', '.coffee' ]
 	},	
 	output: {
-		path: path.join(__dirname,'..','/dist'),
-		publicPath: '/dist',
+		path: path.join(__dirname,'..','/builds'),
+		publicPath: '/builds',
 		filename: "[name].js"
 	},
+	// plugins: plugins,
 	devServer: {
-		port: 3234,
-		disableHostCheck: true
-		// host: 'localhost'
+		port: 7373,
+		disableHostCheck: true,
+		host: 'localhost'
 	}
-	// plugins: [define_plugin]
 }
 module.exports = cfg;
