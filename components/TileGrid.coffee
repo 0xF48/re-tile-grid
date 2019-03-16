@@ -27,6 +27,15 @@ class TileGrid extends Component
 				@calculateGridObjects(props.item_count,@props.item_count) #append items
 			else
 				@buildTileGrid(props.width,props.height,props.item_count) #rebuild everything
+	
+
+
+	componentDidUpdate: ->
+		if @_base.clientWidth != @_base_p_w || @_base.clientHeight != @_base_p_h
+			@_base_p_w = @_base.clientWidth
+			@_base_p_h = @_base.clientHeight
+			@forceUpdate()
+
 
 
 	getStartYFromScroll: (dim,vert)->
@@ -42,6 +51,7 @@ class TileGrid extends Component
 			s_y = @grid.y2
 
 		return s_y
+
 
 
 	getEndYFromScroll: (dim,vert)->
@@ -202,3 +212,4 @@ class TileGrid extends Component
 
 
 module.exports = TileGrid
+
