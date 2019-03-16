@@ -163,7 +163,7 @@ class TileGrid extends Component
 			item: item
 
 		while !@grid.addTile(tile,@grid.full.x2,@grid.x2,@grid.full.y2,@grid.y2)
-			@grid.pad(0,0,0,10)
+			@grid.pad(0,0,0,@props.pad_increment)
 			
 
 
@@ -211,5 +211,7 @@ class TileGrid extends Component
 				@_base && @getRenderItems() || null
 
 
+TileGrid.defaultProps =
+	pad_increment: 1
 module.exports = TileGrid
 
