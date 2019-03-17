@@ -63,22 +63,23 @@ class Docs extends Component
 			items: [0...1000].map (i)->
 				return
 					index: i
-					width: Math.floor(1+Math.random()*2)
-					height: Math.floor(1+Math.random()*2)
+					size: Math.floor(1+Math.random()*2)
+					length: Math.floor(1+Math.random()*2)
 
 	render: ->
 		grid_list = h TileGrid,
 			item_count: 1000
-			width: 6
-			height: -1
-			getItemWidth: (index)=>
-				@state.items[index].width
+			# length: 4
+			scroll: yes
+			size: 6
+			vert: no
+			getItemSize: (index)=>
+				@state.items[index].size
 
-			getItemHeight: (index)=>
-				@state.items[index].height
+			getItemLength: (index)=>
+				@state.items[index].length
 
 			renderItem: (opt)=>
-				# log opt
 				h 'div',
 					key: opt.index
 					className: 'grid-item'
