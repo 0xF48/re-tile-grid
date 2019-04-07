@@ -1,6 +1,6 @@
 {
   "name": "re-tile-grid",
-  "version": "2.0.0",
+  "version": "2.0.3",
   "description": "react tile grid component",
   "main": "./builds/tile-grid.js",
   "scripts": {
@@ -34,15 +34,9 @@
     "rlite-router": "^2.0.3",
     "simple-state-handle": "^2.0.2",
     "style-loader": "^0.21.0",
+    "tile-grid-util": "file:../tile-grid-util",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.2.3",
     "webpack-dev-server": "^3.2.1"
-  },
-  "peerDependencies": {
-    "react": "^16.7.0",
-    "react-dom": "^16.7.0"
-  },
-  "dependencies": {
-    "tile-grid-util": "^0.2.0"
   }
 }

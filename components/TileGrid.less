@@ -2,15 +2,18 @@
 	width: 100%;
 	height: 100%;
 	position: relative;
-	overflow-y: hidden;
-	overflow-x: scroll;
+	overflow: hidden;
 }
 
 .re-tile-grid-inner{
 	position: relative;
 }
 
-.re-tile-grid-vert{
-	overflow-y: scroll;
-	overflow-x: hidden;
+.re-tile-grid-scroll{
+	overflow-x: scroll;
+	overflow-y: hidden;
+	&.re-tile-grid-vert{
+		overflow-y: scroll;
+		overflow-x: hidden;
+	}
 }

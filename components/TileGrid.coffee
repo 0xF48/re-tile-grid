@@ -3,7 +3,7 @@ require './TileGrid.less'
 
 {TileGrid,Tile,Rect} = require 'tile-grid-util'
 TileGrid2 = TileGrid
-
+cn = require 'classnames'
 
 
 class TileGrid extends Component
@@ -14,29 +14,44 @@ class TileGrid extends Component
 			scroll_start_beta: .35
 			scroll_end_beta: .65
 
+
 	componentWillUpdate: (props,state)->
-		if @props.width != props.width || @props.height != props.height
-			state.is_resizing = true
-
-
+		@calculateDim()
+		if @props.size != props.size || @props.length != props.length
+			@state.is_resizing = true
 
 
 	componentDidUpdate: (prev_props,prev_state)->
 		@calculateDim()
+		# log @state.dim_length
+		# dim_str = @state.dim_size + 'x' + @state.dim_length
+		# if dim_str != @state.dim_str
+		# 	@state.dim_str = dim_str
+		# 	setTimeout =>
+		# 		@forceUpdate()
+		# 	,10
+
 		@state.is_resizing = false
 
-
-		if @props.width != prev_props.width || @props.height != prev_props.height
-			@buildTileGrid() #rebuild everything
-			return @forceUpdate()
+		if @props.size != prev_props.size || @props.length != prev_props.length
+			setTimeout =>
+				@calculateDim()
+				@buildTileGrid() #rebuild everything
+				return @forceUpdate()
+			,0
 
 		if prev_props.item_count != @props.item_count
 			if @props.item_count > props.item_count
-				@calculateGridObjects(@props.item_count,prev_props.item_count) #append items
-				return @forceUpdate()
+				setTimeout =>
+					@calculateGridObjects(@props.item_count,prev_props.item_count) #append items
+					return @forceUpdate()
+				,0
 			else
-				@buildTileGrid() #rebuild everything
-				return @forceUpdate()
+				setTimeout =>
+					@calculateDim()
+					@buildTileGrid() #rebuild everything
+					return @forceUpdate()
+				,0
 		
 
 
@@ -76,6 +91,7 @@ class TileGrid extends Component
 
 	getRenderItems: ()->
 		
+
 	
 
 		start_x = 0
@@ -88,9 +104,9 @@ class TileGrid extends Component
 			start_y = 0
 			end_y = @props.length
 
-		items = []
-
-		@grid.crop start_x,end_x,start_y,end_y,(tile,x,y)=>
+		
+		items = @grid.crop start_x,end_x,start_y,end_y,(tile,x,y)=>
+			# throw new Error 'NULL'
 			tile_w = (tile.x2 - tile.x1) * @state.dim_size
 			tile_h = (tile.y2 - tile.y1) * @state.dim_length
 			tile_x = tile.rect.x1 * @state.dim_size
@@ -103,16 +119,17 @@ class TileGrid extends Component
 				x: if @props.vert then tile_x else tile_y
 				y: if @props.vert then tile_y else tile_x
 			
-			items.push @props.renderItem(opts)
+			@props.renderItem(opts)
 
 		return items
 
+
+
 	
-
-
 	addItem: (i)->
 		size = @props.getItemSize(i)
 		length = @props.getItemLength(i)
+		pos = @props.getItemPos(i)
 
 		item = 
 			index: i
@@ -125,11 +142,25 @@ class TileGrid extends Component
 			height: length
 			item: item
 
-		if @props.scroll
-			while !@grid.addTile(tile,@grid.full.x2,@grid.x2,@grid.full.y2,@grid.y2)
-				@grid.pad(0,0,0,@props.pad_increment)
+		if pos
+
+			if @props.scroll
+				while !@grid.insertTile(tile,pos[0],pos[1])
+					@grid.pad(0,0,0,@props.pad_increment)
+			else
+				added = @grid.insertTile(tile,pos[0],pos[1])
+				if !added
+					console.warn 'not enough space to insert tile'
+
 		else
-			added = @grid.addTile(tile,0,@props.size,0,@props.length)
+
+			if @props.scroll
+				while !@grid.addTile(tile,@grid.full.x2,@grid.x2,@grid.full.y2,@grid.y2)
+					@grid.pad(0,0,0,@props.pad_increment)
+			else
+				added = @grid.addTile(tile,0,@props.size,0,@props.length)
+				if !added
+					console.warn 'not enough space to add tile'
 
 
 
@@ -194,18 +225,25 @@ class TileGrid extends Component
 
 
 	render: ->
-		
+		# throw new Error 'null'
 		max_size = '100%'
 		max_length = '100%'
 		if @grid && @props.scroll
 			max_length = (@grid.y2 * @state.dim_length) || 0
+
+		if @_base
+			children = @getRenderItems()
+		else
+			children = []
+			
+		
 
 		createElement 'div',
 			ref: @gridRef
 			onScroll: @props.scroll && @onScroll || null
 			style:
 				visibility: @state.is_resizing && 'hidden'
-			className: 're-tile-grid ' + (@props.vert && 're-tile-grid-vert' || '')
+			className: cn 're-tile-grid',@props.vert && 're-tile-grid-vert',@props.scroll && 're-tile-grid-scroll'
 			createElement 'div',
 				className: 're-tile-grid-inner'
 				ref: @innerRef
@@ -213,7 +251,7 @@ class TileGrid extends Component
 					width: if @props.vert then max_size else max_length
 					height: if @props.vert then max_length else max_size
 				
-				@_base && @getRenderItems() || null
+				children
 
 
 TileGrid.defaultProps =
